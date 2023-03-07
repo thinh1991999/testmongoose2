@@ -4,6 +4,7 @@ var cors = require("cors");
 const userRouter = require("./routes/userRoutes");
 const listingRoutes = require("./routes/listingRoutes");
 const amenityRoutes = require("./routes/amenityRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 const { connectDb } = require("./config/db");
 
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use(userRouter);
 app.use(listingRoutes);
 app.use(amenityRoutes);
+app.use(adminRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

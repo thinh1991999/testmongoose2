@@ -1,6 +1,6 @@
 const express = require("express");
 const User = require("../models/User");
-const auth = require("../middlewares/auth");
+const { auth } = require("../middlewares/auth");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
@@ -22,4 +22,5 @@ router.post("/listings", auth, async (req, res) => {
     return res.status(401).send({ error });
   }
 });
+
 module.exports = router;
