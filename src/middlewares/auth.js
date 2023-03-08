@@ -23,6 +23,7 @@ const auth = async (req, res, next) => {
 };
 
 const authAdmin = async (req, res, next) => {
+  console.log(req.body);
   try {
     const token = req.header("Authorization").replace("Bearer ", "");
     const data = jwt.verify(token, process.env.JWT_KEY);

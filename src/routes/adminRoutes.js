@@ -63,8 +63,8 @@ adminRouters.post("/admin/login", async (req, res) => {
     const token = await user.generateAuthToken();
     return res.send({ user, token });
   } catch (error) {
-    return res.status(400).send({
-      error,
+    return res.status(401).send({
+      error: error.message,
     });
   }
 });
@@ -84,6 +84,7 @@ adminRouters.post("/admin/me/logout", authAdmin, async (req, res) => {
     await req.user.save();
     res.send();
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });

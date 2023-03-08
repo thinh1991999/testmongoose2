@@ -26,7 +26,6 @@ const uploadToStorage = (file) => {
     if (!file) {
       return reject("No file uploaded!");
     }
-
     // Create a unique file name for the uploaded image
     const fileName = Date.now() + "-" + file.originalname;
 

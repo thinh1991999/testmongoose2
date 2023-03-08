@@ -60,8 +60,8 @@ const listingSchema = new mongoose.Schema(
     },
     amenities: [
       {
-        type: String,
-        trim: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Amenity",
       },
     ],
     images: [

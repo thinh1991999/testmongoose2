@@ -1,29 +1,87 @@
 const express = require("express");
 const User = require("../models/User");
-const { auth } = require("../middlewares/auth");
+const { auth, authAdmin } = require("../middlewares/auth");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { multerUploads, uploadToStorage } = require("../middlewares/multer");
+const Amenity = require("../models/Amenity");
 
-const router = express.Router();
+const amenityRoutes = express.Router();
 
-// Create a new listing
-router.post("/amenity", auth, multerUploads, async (req, res) => {
+// Create a new amenity
+amenityRoutes.post("/amenity", multerUploads, async (req, res) => {
   try {
-    const user = req.user;
-    if (user.isAdmin) {
-      const publicUrl = await uploadToStorage(req.file);
-      return res
-        .status(200)
-        .json({ message: "File uploaded successfully!", imageUrl: publicUrl });
-    } else {
-      return res
-        .status(401)
-        .send({ error: "Not authorized to access this resource" });
+    const publicUrl = await uploadToStorage(req.file);
+    const { name, description } = req.body;
+    if (!name || !description) {
+      return res.status(401).send({
+        error: "Invalid data",
+      });
     }
+    const newAmenity = new Amenity({ name, description, icon_url: publicUrl });
+    newAmenity
+      .save()
+      .then((amen) => {
+        console.log(amen);
+        return res.status(200).json({
+          message: "File uploaded successfully!",
+          amenity: amen,
+        });
+      })
+      .catch((err) => {
+        return res.status(401).send({ error: err.message });
+      });
   } catch (error) {
-    return res.status(401).send({ error: error });
+    console.log(error);
+    return res.status(401).send({ error: error.message });
   }
 });
 
-module.exports = router;
+amenityRoutes.get("/amenity/all", async (req, res) => {
+  try {
+    Amenity.find({}).then((aminities) => {
+      return res.status(200).send({ aminities });
+    });
+  } catch (error) {
+    return res.status(401).send({ error: error.message });
+  }
+});
+
+amenityRoutes.post(
+  "/amenity/update",
+  authAdmin,
+  multerUploads,
+  async (req, res) => {
+    try {
+      const publicUrl = await uploadToStorage(req.file);
+      const { name, description } = req.body;
+      if (!name || !description) {
+        return res.status(401).send({
+          error: "Invalid data",
+        });
+      }
+      const newAmenity = new Amenity({
+        name,
+        description,
+        icon_url: publicUrl,
+      });
+      newAmenity
+        .save()
+        .then((amen) => {
+          console.log(amen);
+          return res.status(200).json({
+            message: "Update successfully!",
+            amenity: amen,
+          });
+        })
+        .catch((err) => {
+          return res.status(401).send({ error: err.message });
+        });
+    } catch (error) {
+      console.log(error);
+      return res.status(401).send({ error: error.message });
+    }
+  }
+);
+
+module.exports = amenityRoutes;
