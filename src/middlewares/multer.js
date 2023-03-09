@@ -21,6 +21,18 @@ const multerUploads = multer({
   },
 }).single("image");
 
+const multerUploadsArr = multer({
+  storage: multerStorage,
+  fileFilter: function (req, file, cb) {
+    // Check that the uploaded file is an image
+    if (!file.mimetype.startsWith("image/")) {
+      req.fileValidationError = "Only image files are allowed!";
+      return cb(null, false, new Error("Only image files are allowed!"));
+    }
+    cb(null, true);
+  },
+}).array("imageArr");
+
 const uploadToStorage = (file) => {
   return new Promise((resolve, reject) => {
     if (!file) {
@@ -53,4 +65,4 @@ const uploadToStorage = (file) => {
   });
 };
 
-module.exports = { multerUploads, uploadToStorage };
+module.exports = { multerUploads, uploadToStorage, multerUploadsArr };

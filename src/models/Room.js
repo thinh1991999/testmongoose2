@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-
-const listingSchema = new mongoose.Schema(
+const paginate = require("mongoose-paginate-v2");
+const roomSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -91,8 +91,8 @@ const listingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-listingSchema.index({ location: "2dsphere" });
+roomSchema.index({ location: "2dsphere" });
+roomSchema.plugin(paginate);
+const Room = mongoose.model("Room", roomSchema);
 
-const Listing = mongoose.model("Listing", listingSchema);
-
-module.exports = Listing;
+module.exports = Room;

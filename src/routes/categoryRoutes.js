@@ -9,7 +9,7 @@ const Category = require("../models/Category");
 const categoryRoutes = express.Router();
 
 // Create a new category
-categoryRoutes.post("/category", multerUploads, async (req, res) => {
+categoryRoutes.post("/category", authAdmin, multerUploads, async (req, res) => {
   try {
     const publicUrl = await uploadToStorage(req.file);
     const { name, description } = req.body;
@@ -39,15 +39,36 @@ categoryRoutes.post("/category", multerUploads, async (req, res) => {
   }
 });
 
-// categoryRoutes.get("/amenity/all", async (req, res) => {
-//   try {
-//     Amenity.find({}).then((aminities) => {
-//       return res.status(200).send({ aminities });
-//     });
-//   } catch (error) {
-//     return res.status(401).send({ error: error.message });
-//   }
-// });
+categoryRoutes.get("/category/all", async (req, res) => {
+  try {
+    Category.find({ isDelete: false }).then((categories) => {
+      return res.status(200).send({ categories });
+    });
+  } catch (error) {
+    return res.status(401).send({ error: error.message });
+  }
+});
+
+categoryRoutes.post("/category/delete", authAdmin, async (req, res) => {
+  try {
+    const id = req.body.id;
+    Category.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      { isDelete: true },
+      { new: true }
+    )
+      .then((category) => {
+        return res.status(200).send({ category });
+      })
+      .catch((err) => {
+        return res.status(401).send({ error: err.message });
+      });
+  } catch (error) {
+    return res.status(401).send({ error: error.message });
+  }
+});
 
 // categoryRoutes.post(
 //   "/amenity/update",

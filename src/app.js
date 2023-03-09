@@ -3,8 +3,9 @@ const path = require("path");
 var cors = require("cors");
 var bodyParser = require("body-parser");
 const userRouter = require("./routes/userRoutes");
-const listingRoutes = require("./routes/listingRoutes");
+const roomRoutes = require("./routes/roomRoutes");
 const amenityRoutes = require("./routes/amenityRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
 const { connectDb } = require("./config/db");
@@ -26,8 +27,9 @@ app.get("/", function (req, res) {
 });
 
 app.use(userRouter);
-app.use(listingRoutes);
+app.use(roomRoutes);
 app.use(amenityRoutes);
+app.use(categoryRoutes);
 app.use(adminRoutes);
 
 app.listen(port, () => {

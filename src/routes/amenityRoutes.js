@@ -9,7 +9,7 @@ const Amenity = require("../models/Amenity");
 const amenityRoutes = express.Router();
 
 // Create a new amenity
-amenityRoutes.post("/amenity", multerUploads, async (req, res) => {
+amenityRoutes.post("/amenity", authAdmin, multerUploads, async (req, res) => {
   try {
     const publicUrl = await uploadToStorage(req.file);
     const { name, description } = req.body;
@@ -47,6 +47,7 @@ amenityRoutes.get("/amenity/all", async (req, res) => {
   }
 });
 
+// update
 amenityRoutes.post(
   "/amenity/update",
   authAdmin,
