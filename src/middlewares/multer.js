@@ -58,11 +58,41 @@ const uploadToStorage = (file) => {
       // Get the public URL of the uploaded file
       const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
 
-      return resolve(publicUrl);
+      return resolve({
+        publicUrl,
+        hint: blob.name,
+      });
     });
 
     blobStream.end(file.buffer);
   });
 };
 
-module.exports = { multerUploads, uploadToStorage, multerUploadsArr };
+const deleteStorage = (file) => {
+  console.log(file);
+  return new Promise(async (resolve, reject) => {
+    if (!file) {
+      return reject("No file delete!");
+    }
+    // const deleteOptions = {
+    //   ifGenerationMatch: generationMatchPrecondition,
+    // };
+    storage
+      .bucket("gs://cdw2023-28ddc.appspot.com")
+      .file(file)
+      .delete()
+      .then((res) => {
+        return resolve("success");
+      })
+      .catch((err) => {
+        return reject(err);
+      });
+  });
+};
+
+module.exports = {
+  multerUploads,
+  uploadToStorage,
+  multerUploadsArr,
+  deleteStorage,
+};

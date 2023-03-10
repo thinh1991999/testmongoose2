@@ -6,7 +6,12 @@ const { check, validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const Room = require("../models/Room");
-const { multerUploadsArr, uploadToStorage } = require("../middlewares/multer");
+const {
+  multerUploadsArr,
+  uploadToStorage,
+  multerUploads,
+  deleteStorage,
+} = require("../middlewares/multer");
 
 const router = express.Router();
 
@@ -129,5 +134,42 @@ router.get("/room/all", async (req, res) => {
     return res.status(401).send({ error });
   }
 });
+
+router.post(
+  "/room/image/single",
+  authAdmin,
+  multerUploads,
+  async (req, res) => {
+    try {
+      const publicUrl = await uploadToStorage(req.file);
+      return res.status(200).json({
+        message: "File uploaded successfully!",
+        url: publicUrl,
+      });
+    } catch (error) {
+      return res.status(401).send({ error });
+    }
+  }
+);
+
+router.post(
+  "/room/image/delete",
+  authAdmin,
+  multerUploads,
+  async (req, res) => {
+    try {
+      const publicUrl = req.body.url;
+      deleteStorage(publicUrl)
+        .then((vl) => {
+          return res.status(200).send({ error: vl });
+        })
+        .catch((err) => {
+          return res.status(401).send({ error: err.message });
+        });
+    } catch (error) {
+      return res.status(401).send({ error: error.message });
+    }
+  }
+);
 
 module.exports = router;

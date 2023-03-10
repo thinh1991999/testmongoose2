@@ -39,8 +39,8 @@ amenityRoutes.post("/amenity", authAdmin, multerUploads, async (req, res) => {
 
 amenityRoutes.get("/amenity/all", async (req, res) => {
   try {
-    Amenity.find({}).then((aminities) => {
-      return res.status(200).send({ aminities });
+    Amenity.find({}).then((amenities) => {
+      return res.status(200).send({ amenities });
     });
   } catch (error) {
     return res.status(401).send({ error: error.message });
