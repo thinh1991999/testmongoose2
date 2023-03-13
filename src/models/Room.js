@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const paginate = require("mongoose-paginate-v2");
 const roomSchema = new mongoose.Schema(
   {
-    title: {
+    name: {
       type: String,
       required: true,
       trim: true,
@@ -66,8 +66,7 @@ const roomSchema = new mongoose.Schema(
     ],
     images: [
       {
-        type: String,
-        required: true,
+        type: Object,
       },
     ],
     owner: {

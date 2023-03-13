@@ -24,7 +24,6 @@ const multerUploads = multer({
 const multerUploadsArr = multer({
   storage: multerStorage,
   fileFilter: function (req, file, cb) {
-    // Check that the uploaded file is an image
     if (!file.mimetype.startsWith("image/")) {
       req.fileValidationError = "Only image files are allowed!";
       return cb(null, false, new Error("Only image files are allowed!"));
@@ -55,9 +54,7 @@ const uploadToStorage = (file) => {
     });
 
     blobStream.on("finish", async () => {
-      // Get the public URL of the uploaded file
       const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-
       return resolve({
         publicUrl,
         hint: blob.name,
@@ -69,7 +66,6 @@ const uploadToStorage = (file) => {
 };
 
 const deleteStorage = (file) => {
-  console.log(file);
   return new Promise(async (resolve, reject) => {
     if (!file) {
       return reject("No file delete!");
@@ -82,7 +78,7 @@ const deleteStorage = (file) => {
       .file(file)
       .delete()
       .then((res) => {
-        return resolve("success");
+        return resolve("Delete successfull");
       })
       .catch((err) => {
         return reject(err);
