@@ -47,7 +47,6 @@ router.post(
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).send({ errors: errors.array() });
-      } else {
       }
       const imgArr = [];
       // for (let i = 0; i < req.files.length; i++) {
@@ -172,7 +171,6 @@ const options = {
 router.get("/room/all", async (req, res) => {
   try {
     Room.paginate({}, options, function (err, result) {
-      console.log(err, result);
       return res.status(200).send({
         err,
         result,

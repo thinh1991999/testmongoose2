@@ -1,27 +1,64 @@
+const { ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
+const { Server } = require("socket.io");
+const User = require("../models/User");
 
 const startSocket = (io) => {
   const connection = mongoose.connection;
+
+  io.of("/reviews").on("connection", (socket) => {
+    console.log("socket.io: User connected: ", socket.id);
+    socket.on("join_room", (data) => {
+      socket.join(data);
+    });
+    socket.on("disconnect", () => {
+      console.log("socket.io: User disconnected: ", socket.id);
+    });
+  });
+
   connection.once("open", () => {
     console.log("MongoDB database connected");
 
     console.log("Setting change streams");
     const reviewChangeStream = connection.collection("reviews").watch();
-
     reviewChangeStream.on("change", (change) => {
       switch (change.operationType) {
         case "insert":
-          const { _id, room } = change.fullDocument;
-          const review = {
-            _id: change.fullDocument._id,
-            name: change.fullDocument.name,
-            description: change.fullDocument.description,
-          };
-          const reviewSpace = io.of("/reviews");
-          reviewSpace.on("connection", (socket) => {
-            socket.join(room); // distinct from the room in the "orders" namespace
-            reviewSpace.to(room).emit("newReview", review);
-          });
+          const {
+            _id,
+            rating,
+            description,
+            room,
+            createdAt,
+            updatedAt,
+            owner,
+          } = change.fullDocument;
+          User.findById(owner)
+            .select([
+              "_id",
+              "email",
+              "firstName",
+              "lastName",
+              "profilePic",
+              "bio",
+              "phoneNumber",
+              "gender",
+              "dateOfBirth",
+              "address",
+            ])
+            .then((user) => {
+              const review = {
+                _id,
+                description,
+                rating,
+                room,
+                createdAt,
+                updatedAt,
+                owner: user,
+              };
+              io.of("/reviews").to(room.toString()).emit("new_review", review);
+            });
+
           break;
         case "delete":
           // io.of("/api/socket").emit("deletedThought", change.documentKey._id);

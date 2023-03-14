@@ -42,6 +42,7 @@ reviewRoutes.post(
             .then(() => {
               return res.status(200).send({
                 message: "Create a review successfull",
+                review,
               });
             })
             .catch((err) => {
@@ -59,7 +60,8 @@ reviewRoutes.post(
 
 const options = {
   page: 1,
-  limit: 10,
+  limit: 100,
+  sort: { createdAt: "desc" },
   populate: [
     {
       path: "owner",
@@ -73,14 +75,6 @@ const options = {
 
 reviewRoutes.get("/review/all", async (req, res) => {
   try {
-    // Review.find({})
-    //   .exec()
-    //   .then((reviews) => {
-    //     return res.status(200).send({ message: "Successfull", reviews });
-    //   })
-    //   .catch((error) => {
-    //     return res.status(401).send({ error: error.message });
-    //   });
     const id = req.query.id;
     if (mongoose.Types.ObjectId.isValid(id)) {
       Review.paginate({}, options, function (err, result) {

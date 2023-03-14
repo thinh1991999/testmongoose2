@@ -24,13 +24,14 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 8,
+      minlength: 6,
     },
     profilePic: {
       type: String,
-      default: "https://i.imgur.com/SBv4qiW.png",
+      default:
+        "https://firebasestorage.googleapis.com/v0/b/cdw2023-28ddc.appspot.com/o/unknown-user.jpg?alt=media&token=782a8b62-27d8-4b2a-a102-f7bc50fc4b2b",
     },
-    bio: {
+    description: {
       type: String,
       maxlength: 300,
     },

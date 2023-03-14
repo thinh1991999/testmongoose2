@@ -20,8 +20,13 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
-startSocket(io);
+const io = new Server(server, {
+  cors: {
+    origin: "http://127.0.0.1:5173",
+    methods: ["GET", "POST"],
+  },
+});
+
 app.use(cors());
 app.use(
   bodyParser.urlencoded({
@@ -40,6 +45,7 @@ app.use(amenityRoutes);
 app.use(categoryRoutes);
 app.use(adminRoutes);
 app.use(reviewRoutes);
+startSocket(io);
 server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

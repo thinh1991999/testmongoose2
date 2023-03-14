@@ -1,67 +1,69 @@
 const express = require("express");
 const User = require("../models/User");
 const { auth } = require("../middlewares/auth");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+const { check, validationResult } = require("express-validator");
 
 const router = express.Router();
 
 // Create a new user
-router.post("/users", async (req, res) => {
-  try {
-    const { email, firstName, lastName, password } = req.body;
-    User.findOne({ email })
-      .exec()
-      .then((user) => {
-        if (user === null) {
-          const newUser = new User({ email, firstName, lastName, password });
-          newUser
-            .save()
-            .then(() => {
-              return res.status(200).send({
-                message: "Đăng ký thành công",
+router.post(
+  "/user/create",
+  [
+    check("email", "email field is required").not().isEmpty(),
+    check("email", "email field is invalid").isEmail(),
+    check("firstName", "firstName field is required").not().isEmpty(),
+    check("lastName", "lastName field is required").not().isEmpty(),
+    check("address", "address field is required").not().isEmpty(),
+    check("description", "description field is required").not().isEmpty(),
+    check("phoneNumber", "phoneNumber field is required").not().isEmpty(),
+    check("phoneNumber", "phoneNumber field is invalid").isMobilePhone(),
+    check("gender", "gender field is required").not().isEmpty(),
+    check("password", "password field is required").not().isEmpty(),
+    check("password", "password field is invalid").isLength(6),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).send({ errors: errors.array()[0].msg });
+      }
+      const { email, firstName, lastName, password } = req.body;
+      User.findOne({ email })
+        .exec()
+        .then((user) => {
+          if (user === null) {
+            const newUser = new User({ email, firstName, lastName, password });
+            newUser
+              .save()
+              .then(() => {
+                return res.status(200).send({
+                  message: "Sign up successfull",
+                });
+              })
+              .catch((err) => {
+                return res.status(400).send(err);
               });
-            })
-            .catch((err) => {
-              return res.status(400).send(err);
+          } else {
+            return res.status(400).send({
+              error: "This email is already registered",
             });
-        } else {
+          }
+        })
+        .catch((error) => {
           return res.status(400).send({
-            error: "Email này đã được đăng ký!",
+            error: error.message,
           });
-        }
-      })
-      .catch((error) => {
-        return res.status(400).send(error);
+        });
+    } catch (error) {
+      return res.status(400).send({
+        error: error.message,
       });
-    // User.findOne({ email }).exec((err, user) => {
-    //   if (user) {
-    //     return res.status(400).send({
-    //       error: "Email này đã được đăng ký!",
-    //     });
-    //   } else {
-    //     const newUser = new User({ email, firstName, lastName, password });
-    //     newUser.save((err, success) => {
-    //       if (err) {
-    //         return res.status(400).send({
-    //           error: "Có lỗi xảy ra, vui lòng thử lại!",
-    //         });
-    //       } else {
-    //         return res.status(200).send({
-    //           mess: "Đăng ký thành công!",
-    //         });
-    //       }
-    //     });
-    //   }
-    // });
-  } catch (error) {
-    console.log(error);
-    return res.status(400).send(error);
+    }
   }
-});
+);
 
 // Login
-router.post("/users/login", async (req, res) => {
+router.post("/user/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findByCredentials(email, password);
@@ -73,7 +75,9 @@ router.post("/users/login", async (req, res) => {
     const token = await user.generateAuthToken();
     return res.send({ user, token });
   } catch (error) {
-    return res.status(400).send(error);
+    return res.status(400).send({
+      error: error.message,
+    });
   }
 });
 
@@ -83,7 +87,7 @@ router.get("/users/me", auth, async (req, res) => {
 });
 
 // Logout
-router.post("/users/me/logout", auth, async (req, res) => {
+router.post("/user/me/logout", auth, async (req, res) => {
   // Log user out of the application
   try {
     req.user.tokens = req.user.tokens.filter((token) => {
@@ -92,7 +96,9 @@ router.post("/users/me/logout", auth, async (req, res) => {
     await req.user.save();
     res.send();
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send({
+      error: error.message,
+    });
   }
 });
 
