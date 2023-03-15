@@ -60,8 +60,16 @@ const startSocket = (io) => {
             });
 
           break;
+        case "update":
+          const id = change.documentKey._id;
+          const vlChange = change.updateDescription.updatedFields;
+          io.of("/reviews").emit("update_review", {
+            id,
+            vlChange,
+          });
+          break;
         case "delete":
-          // io.of("/api/socket").emit("deletedThought", change.documentKey._id);
+          io.of("/reviews").emit("delete_review", change.documentKey._id);
           break;
       }
     });

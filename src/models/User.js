@@ -28,30 +28,34 @@ const userSchema = new mongoose.Schema(
     },
     profilePic: {
       type: String,
-      default:
-        "https://firebasestorage.googleapis.com/v0/b/cdw2023-28ddc.appspot.com/o/unknown-user.jpg?alt=media&token=782a8b62-27d8-4b2a-a102-f7bc50fc4b2b",
+      default: process.env.BASE_AVATAR,
+    },
+    hintPic: {
+      type: String,
+      default: null,
     },
     description: {
       type: String,
       maxlength: 300,
+      default: "",
     },
     phoneNumber: {
       type: String,
       maxlength: 15,
+      default: "",
     },
     gender: {
       type: String,
       enum: ["male", "female", "other"],
+      default: "male",
     },
     dateOfBirth: {
       type: Date,
+      default: Date.now,
     },
     address: {
-      street: String,
-      city: String,
-      state: String,
-      zipCode: String,
-      country: String,
+      type: String,
+      default: null,
     },
     verified: {
       type: Boolean,

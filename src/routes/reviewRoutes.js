@@ -58,6 +58,157 @@ reviewRoutes.post(
   }
 );
 
+// update review
+reviewRoutes.put(
+  "/review/update",
+  auth,
+  [
+    check("rating", "rating field is required").not().isEmpty(),
+    check("rating", "rating field is a number").isNumeric(),
+    check("description", "description field is required").not().isEmpty(),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).send({ errors: errors.array() });
+      }
+      const id = req.query.id;
+      if (mongoose.Types.ObjectId.isValid(id)) {
+        const { rating, description } = req.body;
+        Review.findOneAndUpdate(
+          {
+            _id: id,
+            owner: req.user._id,
+          },
+          {
+            rating,
+            description,
+          },
+          {
+            new: true,
+          }
+        )
+          .exec()
+          .then((review) => {
+            if (!review) {
+              return res.status(401).send({
+                error:
+                  "Dont have this review id or you dont have permission to update this",
+              });
+            }
+            return res.status(200).send({
+              message: "Update a review successfull",
+              review,
+            });
+          })
+          .catch((err) => {
+            return res.status(401).send({ error: err.message });
+          });
+      } else {
+        return res.status(401).send({ error: "Invalid id" });
+      }
+    } catch (error) {
+      return res.status(401).send({ error: error.message });
+    }
+  }
+);
+
+// delete review
+reviewRoutes.delete("/review/delete", auth, async (req, res) => {
+  try {
+    const id = req.query.id;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      const { rating, description } = req.body;
+      Review.findOneAndDelete({
+        _id: id,
+        owner: req.user._id,
+      })
+        .exec()
+        .then((review) => {
+          if (!review) {
+            return res.status(401).send({
+              error:
+                "Dont have this review id or you dont have permission to delete this",
+            });
+          }
+          User.findByIdAndUpdate(
+            req.user._id,
+            { $pull: { reviews: id } },
+            { safe: true, upsert: true }
+          )
+            .exec()
+            .then((user) => {
+              if (!user) {
+                return res.status(401).send({
+                  error:
+                    "Dont have this review id or you dont have permission to delete this",
+                });
+              }
+              return res.status(200).send({
+                message: "Delete review successfull",
+                review,
+              });
+            });
+        })
+        .catch((err) => {
+          return res.status(401).send({ error: err.message });
+        });
+    } else {
+      return res.status(401).send({ error: "Invalid id" });
+    }
+  } catch (error) {
+    return res.status(401).send({ error: error.message });
+  }
+});
+
+// like review
+reviewRoutes.delete("/review/delete", auth, async (req, res) => {
+  try {
+    const id = req.query.id;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      Review.findOneAndDelete({
+        _id: id,
+        owner: req.user._id,
+      })
+        .exec()
+        .then((review) => {
+          if (!review) {
+            return res.status(401).send({
+              error:
+                "Dont have this review id or you dont have permission to delete this",
+            });
+          }
+          User.findByIdAndUpdate(
+            req.user._id,
+            { $pull: { reviews: id } },
+            { safe: true, upsert: true }
+          )
+            .exec()
+            .then((user) => {
+              if (!user) {
+                return res.status(401).send({
+                  error:
+                    "Dont have this review id or you dont have permission to delete this",
+                });
+              }
+              return res.status(200).send({
+                message: "Delete review successfull",
+                review,
+              });
+            });
+        })
+        .catch((err) => {
+          return res.status(401).send({ error: err.message });
+        });
+    } else {
+      return res.status(401).send({ error: "Invalid id" });
+    }
+  } catch (error) {
+    return res.status(401).send({ error: error.message });
+  }
+});
+
 const options = {
   page: 1,
   limit: 100,
@@ -77,7 +228,7 @@ reviewRoutes.get("/review/all", async (req, res) => {
   try {
     const id = req.query.id;
     if (mongoose.Types.ObjectId.isValid(id)) {
-      Review.paginate({}, options, function (err, result) {
+      Review.paginate({ room: id }, options, function (err, result) {
         return res.status(200).send({
           err,
           result,

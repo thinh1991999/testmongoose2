@@ -2,6 +2,7 @@ const express = require("express");
 const User = require("../models/User");
 const { auth } = require("../middlewares/auth");
 const { check, validationResult } = require("express-validator");
+const { multerUploads, uploadToStorage } = require("../middlewares/multer");
 
 const router = express.Router();
 
@@ -136,6 +137,90 @@ router.post("/users/me/update", auth, async (req, res) => {
     return res.status(500).send(error);
   }
 });
+
+// Update avatar
+router.post("/user/me/avatar/update", multerUploads, auth, async (req, res) => {
+  try {
+    const { publicUrl, hint } = await uploadToStorage(req.file);
+    User.findByIdAndUpdate(
+      req.user._id,
+      {
+        profilePic: publicUrl,
+        hintPic: hint,
+      },
+      { new: true }
+    )
+      .exec()
+      .then((user) => {
+        res.status(200).send({
+          message: "Update avatar successful",
+          user,
+        });
+      })
+      .catch((error) => {
+        return res.status(500).send({
+          error: error.message,
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      error: error.message,
+    });
+  }
+});
+
+// Update profile
+router.put(
+  "/user/me/profile/update",
+  auth,
+  [
+    check("firstName", "firstName field is required").not().isEmpty(),
+    check("lastName", "lastName field is required").not().isEmpty(),
+    check("address", "address field is required").not().isEmpty(),
+    check("description", "description field is required").not().isEmpty(),
+    check("phoneNumber", "phoneNumber field is required").not().isEmpty(),
+    check("phoneNumber", "phoneNumber field is invalid").isMobilePhone(),
+    check("gender", "gender field is required").not().isEmpty(),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).send({ errors: errors.array()[0].msg });
+      }
+      const { firstName, lastName, address, description, phoneNumber, gender } =
+        req.body;
+      User.findByIdAndUpdate(
+        req.user._id,
+        {
+          firstName,
+          lastName,
+          address,
+          description,
+          phoneNumber,
+          gender,
+        },
+        { new: true }
+      )
+        .exec()
+        .then((user) => {
+          res.status(200).send({
+            message: "Update profile successful",
+            user,
+          });
+        })
+        .catch((error) => {
+          return res.status(500).send({
+            error: error.message,
+          });
+        });
+    } catch (error) {
+      return res.status(500).send({
+        error: error.message,
+      });
+    }
+  }
+);
 
 // router.post("/usersTest", async (req, res) => {
 //   // Create a new user
