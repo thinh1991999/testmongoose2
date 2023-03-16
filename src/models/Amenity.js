@@ -8,12 +8,17 @@ const amenitySchema = new mongoose.Schema(
       unique: true,
     },
     icon_url: {
-      type: String,
+      type: Object,
       required: true,
     },
     description: {
       type: String,
       required: true,
+    },
+    isDelete: {
+      type: Boolean,
+      default: false,
+      required: false,
     },
   },
   {

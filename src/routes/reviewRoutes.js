@@ -163,43 +163,62 @@ reviewRoutes.delete("/review/delete", auth, async (req, res) => {
 });
 
 // like review
-reviewRoutes.delete("/review/delete", auth, async (req, res) => {
+reviewRoutes.post("/review/like", auth, async (req, res) => {
+  console.log(req.user._id);
   try {
     const id = req.query.id;
     if (mongoose.Types.ObjectId.isValid(id)) {
-      Review.findOneAndDelete({
-        _id: id,
-        owner: req.user._id,
-      })
+      Review.updateOne(
+        {
+          _id: id,
+          likes: { $ne: req.user._id },
+        },
+        {
+          $inc: {
+            likeCount: 1,
+          },
+          $push: { likes: req.user._id },
+          $pull: { dislikes: req.user._id },
+        }
+      )
         .exec()
         .then((review) => {
-          if (!review) {
-            return res.status(401).send({
-              error:
-                "Dont have this review id or you dont have permission to delete this",
-            });
-          }
-          User.findByIdAndUpdate(
-            req.user._id,
-            { $pull: { reviews: id } },
-            { safe: true, upsert: true }
-          )
-            .exec()
-            .then((user) => {
-              if (!user) {
-                return res.status(401).send({
-                  error:
-                    "Dont have this review id or you dont have permission to delete this",
-                });
-              }
-              return res.status(200).send({
-                message: "Delete review successfull",
-                review,
-              });
-            });
+          console.log(review);
+          return res.status(200).send({ message: "Success" });
         })
-        .catch((err) => {
-          return res.status(401).send({ error: err.message });
+        .catch((error) => {
+          return res.status(401).send({ error: error.message });
+        });
+    } else {
+      return res.status(401).send({ error: "Invalid id" });
+    }
+  } catch (error) {
+    return res.status(401).send({ error: error.message });
+  }
+});
+
+// dislike review
+reviewRoutes.post("/review/dislike", auth, async (req, res) => {
+  try {
+    const id = req.query.id;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      Review.updateOne(
+        {
+          _id: id,
+          dislikes: { $ne: req.user._id },
+        },
+        {
+          $inc: { dislikeCount: 1 },
+          $push: { dislikes: req.user._id },
+          $pull: { likes: req.user._id },
+        }
+      )
+        .exec()
+        .then((review) => {
+          return res.status(200).send({ message: "Success" });
+        })
+        .catch((error) => {
+          return res.status(401).send({ error: error.message });
         });
     } else {
       return res.status(401).send({ error: "Invalid id" });

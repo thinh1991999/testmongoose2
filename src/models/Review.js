@@ -23,15 +23,15 @@ const reviewSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    likes: { type: Number, default: 0 },
-    dislikes: { type: Number, default: 0 },
-    usersLiked: [
+    likeCount: { type: Number, default: 0 },
+    dislikeCount: { type: Number, default: 0 },
+    likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },
     ],
-    usersDisliked: [
+    dislikes: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

@@ -1,9 +1,6 @@
 const express = require("express");
 const User = require("../models/User");
 const { authAdmin } = require("../middlewares/auth");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-
 const adminRouters = express.Router();
 
 // Create a new admin
