@@ -16,6 +16,16 @@ const startSocket = (io) => {
     });
   });
 
+  io.of("/notifications").on("connection", (socket) => {
+    console.log("socket.io: User connected notifica: ", socket.id);
+    socket.on("join_room", (data) => {
+      socket.join(data);
+    });
+    socket.on("disconnect", () => {
+      console.log("socket.io: User disconnected: ", socket.id);
+    });
+  });
+
   connection.once("open", () => {
     console.log("MongoDB database connected");
 
@@ -61,6 +71,7 @@ const startSocket = (io) => {
 
           break;
         case "update":
+          console.log(change.updateDescription.updatedFields.likes);
           const id = change.documentKey._id;
           const vlChange = change.updateDescription.updatedFields;
           io.of("/reviews").emit("update_review", {
