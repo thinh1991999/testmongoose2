@@ -33,11 +33,18 @@ const roomSchema = new mongoose.Schema(
         trim: true,
       },
     },
-    propertyType: {
-      type: String,
-      required: true,
-      enum: ["Entire place", "Private room", "Shared room"],
-    },
+    placeType: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "TypePlace",
+      },
+    ],
+    propertyType: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PropertyType",
+      },
+    ],
     guests: {
       type: Number,
       required: true,

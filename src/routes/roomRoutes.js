@@ -2,17 +2,14 @@ const express = require("express");
 var mongoose = require("mongoose");
 const User = require("../models/User");
 const { auth, authAdmin } = require("../middlewares/auth");
-const { validator } = require("../middlewares/room");
 const { check, validationResult } = require("express-validator");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
 const Room = require("../models/Room");
 const {
-  multerUploadsArr,
   uploadToStorage,
   multerUploads,
   deleteStorage,
 } = require("../middlewares/multer");
+const { decodeFilterCountRoom } = require("../share/ultils");
 
 const router = express.Router();
 
@@ -176,6 +173,117 @@ router.get("/room/all", async (req, res) => {
         result,
       });
     });
+  } catch (error) {
+    return res.status(401).send({ error: error.message });
+  }
+});
+
+router.get("/room/filter/count", async (req, res) => {
+  try {
+    let find = {};
+    const {
+      minPrice = 0,
+      maxPrice = 1000,
+      bathRooms = "ALL",
+      bedRooms = "ALL",
+      beds = "ALL",
+      amenities = [],
+      properties = [],
+      places = [],
+    } = req.query;
+    find = {
+      pricePerNight: { $lte: maxPrice },
+      pricePerNight: { $gte: minPrice },
+    };
+    if (amenities.length > 0) {
+      find = {
+        ...find,
+        amenities: { $all: amenities },
+      };
+    }
+    if (properties.length > 0) {
+      find = {
+        ...find,
+        propertyType: { $all: properties },
+      };
+    }
+    if (places.length > 0) {
+      find = {
+        ...find,
+        placeType: { $all: places },
+      };
+    }
+    Room.find({
+      ...find,
+      ...decodeFilterCountRoom("baths", bathRooms),
+      ...decodeFilterCountRoom("bedrooms", bedRooms),
+      ...decodeFilterCountRoom("beds", beds),
+    })
+      .exec()
+      .then((rooms) => {
+        return res.status(200).send({ rooms: rooms.length });
+      })
+      .catch((err) => {
+        return res.status(200).send({ rooms: 0 });
+      });
+  } catch (error) {
+    return res.status(401).send({ error: error.message });
+  }
+});
+
+router.get("/room/filter", async (req, res) => {
+  try {
+    let find = {};
+    const {
+      minPrice = 0,
+      maxPrice = 1000,
+      bathRooms = "ALL",
+      bedRooms = "ALL",
+      beds = "ALL",
+      amenities = [],
+      properties = [],
+      places = [],
+    } = req.query;
+    find = {
+      pricePerNight: { $gte: minPrice },
+      pricePerNight: { $lte: maxPrice },
+    };
+    if (amenities.length > 0) {
+      find = {
+        ...find,
+        amenities: { $all: amenities },
+      };
+    }
+    if (properties.length > 0) {
+      find = {
+        ...find,
+        propertyType: { $all: properties },
+      };
+    }
+    if (places.length > 0) {
+      find = {
+        ...find,
+        placeType: { $all: places },
+      };
+    }
+    Room.find({
+      ...find,
+      ...decodeFilterCountRoom("baths", bathRooms),
+      ...decodeFilterCountRoom("bedrooms", bedRooms),
+      ...decodeFilterCountRoom("beds", beds),
+    })
+      .populate("reviews")
+      .populate({
+        path: "owner",
+        select: ["_id", "firstName", "lastName", "profilePic"],
+      })
+      .exec()
+      .then((rooms) => {
+        return res.status(200).send({ rooms: rooms });
+      })
+      .catch((err) => {
+        return res.status(200).send({ rooms: [] });
+      });
   } catch (error) {
     return res.status(401).send({ error: error.message });
   }

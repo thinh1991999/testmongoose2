@@ -1,12 +1,10 @@
 const express = require("express");
 const User = require("../models/User");
-const { auth, authAdmin } = require("../middlewares/auth");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const { multerUploads, uploadToStorage } = require("../middlewares/multer");
+const { auth } = require("../middlewares/auth");
 const Review = require("../models/Review");
 const { check, validationResult } = require("express-validator");
 const { default: mongoose } = require("mongoose");
+const Room = require("../models/Room");
 const reviewRoutes = express.Router();
 
 // Create a new review
@@ -40,10 +38,17 @@ reviewRoutes.post(
           User.findByIdAndUpdate(userid, { $push: { reviews: review._id } })
             .exec()
             .then(() => {
-              return res.status(200).send({
-                message: "Create a review successfull",
-                review,
-              });
+              Room.findByIdAndUpdate(room, { $push: { reviews: review._id } })
+                .exec()
+                .then(() => {
+                  return res.status(200).send({
+                    message: "Create a review successfull",
+                    review,
+                  });
+                })
+                .catch((err) => {
+                  return res.status(401).send({ error: err.message });
+                });
             })
             .catch((err) => {
               return res.status(401).send({ error: err.message });
@@ -164,7 +169,6 @@ reviewRoutes.delete("/review/delete", auth, async (req, res) => {
 
 // like review
 reviewRoutes.post("/review/like", auth, async (req, res) => {
-  console.log(req.user._id);
   try {
     const id = req.query.id;
     if (mongoose.Types.ObjectId.isValid(id)) {
@@ -183,7 +187,6 @@ reviewRoutes.post("/review/like", auth, async (req, res) => {
       )
         .exec()
         .then((review) => {
-          console.log(review);
           return res.status(200).send({ message: "Success" });
         })
         .catch((error) => {

@@ -10,6 +10,8 @@ const amenityRoutes = require("./routes/amenityRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
+const propertyTypeRoutes = require("./routes/propertyTypeRoutes");
+const typePlaceRoutes = require("./routes/typePlaceRoutes");
 
 const { connectDb } = require("./config/db");
 const startSocket = require("./socket/socket");
@@ -45,6 +47,9 @@ app.use(amenityRoutes);
 app.use(categoryRoutes);
 app.use(adminRoutes);
 app.use(reviewRoutes);
+app.use(propertyTypeRoutes);
+app.use(typePlaceRoutes);
+
 startSocket(io);
 server.listen(port, () => {
   console.log(`Server running on port ${port}`);

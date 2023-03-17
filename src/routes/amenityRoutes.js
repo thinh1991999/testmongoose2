@@ -1,8 +1,5 @@
 const express = require("express");
-const User = require("../models/User");
-const { auth, authAdmin } = require("../middlewares/auth");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+const { authAdmin } = require("../middlewares/auth");
 const { multerUploads, uploadToStorage } = require("../middlewares/multer");
 const Amenity = require("../models/Amenity");
 const { default: mongoose } = require("mongoose");
