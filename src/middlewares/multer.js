@@ -35,7 +35,9 @@ const multerUploadsArr = multer({
 const uploadToStorage = (file) => {
   return new Promise((resolve, reject) => {
     if (!file) {
-      return reject("No file uploaded!");
+      return reject({
+        message: "No file uploaded!",
+      });
     }
     // Create a unique file name for the uploaded image
     const fileName = Date.now() + "-" + file.originalname;
@@ -49,8 +51,9 @@ const uploadToStorage = (file) => {
     });
 
     blobStream.on("error", (err) => {
-      console.log(err);
-      return reject("Unable to upload image!");
+      return reject({
+        message: "Unable to upload image!",
+      });
     });
 
     blobStream.on("finish", async () => {
@@ -68,7 +71,9 @@ const uploadToStorage = (file) => {
 const deleteStorage = (file) => {
   return new Promise(async (resolve, reject) => {
     if (!file) {
-      return reject("No file delete!");
+      return reject({
+        message: "No file delete!",
+      });
     }
     // const deleteOptions = {
     //   ifGenerationMatch: generationMatchPrecondition,

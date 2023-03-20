@@ -1,0 +1,1240 @@
+{
+	"info": {
+		"_postman_id": "8a3799bf-5fcf-49fb-9993-99f54290b9f0",
+		"name": "Airbnb",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Create user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\":\"Do\",\r\n    \"lastName\":\"Thinh\",\r\n    \"email\":\"test@gmail.com\",\r\n    \"address\":\"HCM\",\r\n    \"description\":\"test\",\r\n    \"phoneNumber\":\"0988182831\",\r\n    \"gender\":\"male\",\r\n    \"password\":\"11111111\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user/create",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"test@gmail.com\",\r\n    \"password\":\"11111111\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Detail user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/users/me",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/user/me/logout",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"me",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update avatar",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/thinh.do/Pictures/download.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/user/me/avatar/update",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"me",
+								"avatar",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\":\"Do\",\r\n    \"lastName\":\"Thinh123\",\r\n    \"address\":\"HCM\",\r\n    \"description\":\"test\",\r\n    \"phoneNumber\":\"0988182831\",\r\n    \"gender\":\"male\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user/me/profile/update",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"me",
+								"profile",
+								"update"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Create admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\":\"Do\",\r\n    \"lastName\":\"Thinh\",\r\n    \"email\":\"test@gmail.com\",\r\n    \"address\":\"HCM\",\r\n    \"description\":\"test\",\r\n    \"phoneNumber\":\"0988182831\",\r\n    \"gender\":\"male\",\r\n    \"password\":\"11111111\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/admin",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"test@gmail.com\",\r\n    \"password\":\"11111111\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/admin/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"admin",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Detail admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/admin/me",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"admin",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/admin/me/logout",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"admin",
+								"me",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update avatar",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/thinh.do/Pictures/download.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/user/me/avatar/update",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"me",
+								"avatar",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\":\"Do\",\r\n    \"lastName\":\"Thinh123\",\r\n    \"address\":\"HCM\",\r\n    \"description\":\"test\",\r\n    \"phoneNumber\":\"0988182831\",\r\n    \"gender\":\"male\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user/me/profile/update",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"me",
+								"profile",
+								"update"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Review",
+			"item": [
+				{
+					"name": "Create review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"room\":\"640ea7cd4d1c2a1e445084a8\",\r\n    \"rating\":1,\r\n    \"description\":\"Very Bad experient\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/review/create",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"review",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"rating\":2,\r\n    \"description\":\"Very Bad experient\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/review/update?id=6417c81b1e4d9a8300f674ea",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"review",
+								"update"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "6417c81b1e4d9a8300f674ea"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/review/delete?id=6417c81b1e4d9a8300f674ea",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"review",
+								"delete"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "6417c81b1e4d9a8300f674ea"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/review/like?id=6417c8991e4d9a8300f67514",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"review",
+								"like"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "6417c8991e4d9a8300f67514"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Dislike review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/review/dislike?id=6417c8991e4d9a8300f67514",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"review",
+								"dislike"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "6417c8991e4d9a8300f67514"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all review",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/review/all?id=640ea7cd4d1c2a1e445084a8",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"review",
+								"all"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "640ea7cd4d1c2a1e445084a8"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Room",
+			"item": [
+				{
+					"name": "Get room detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create new room",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"\",\r\n    \"description\":\"\",\r\n    \"pricePerNight\":\"\",\r\n    \"locationX\":1,\r\n    \"locationY\":2,\r\n    \"address\":\"\",\r\n    \"propertyType\":\"\",\r\n    \"guests\":1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/room/create",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"room",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get room all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/room/all",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"room",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create single image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/thinh.do/Pictures/unknown-user.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/room/image/single",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"room",
+								"image",
+								"single"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete single image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"url\":\"1679280682243-unknown-user.jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/room/image/delete",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"room",
+								"image",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter count",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/room/filter/count?minPrice=0&maxPrice=1000&bathRooms=ALL&bedRooms=ALL&beds=ALL",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"room",
+								"filter",
+								"count"
+							],
+							"query": [
+								{
+									"key": "minPrice",
+									"value": "0"
+								},
+								{
+									"key": "maxPrice",
+									"value": "1000"
+								},
+								{
+									"key": "bathRooms",
+									"value": "ALL"
+								},
+								{
+									"key": "bedRooms",
+									"value": "ALL"
+								},
+								{
+									"key": "beds",
+									"value": "ALL"
+								},
+								{
+									"key": "amenities",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/room/filter?minPrice=0&maxPrice=1000&bathRooms=ALL&bedRooms=ALL&beds=ALL",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"room",
+								"filter"
+							],
+							"query": [
+								{
+									"key": "minPrice",
+									"value": "0"
+								},
+								{
+									"key": "maxPrice",
+									"value": "1000"
+								},
+								{
+									"key": "bathRooms",
+									"value": "ALL"
+								},
+								{
+									"key": "bedRooms",
+									"value": "ALL"
+								},
+								{
+									"key": "beds",
+									"value": "ALL"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Amenity",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Self check-in",
+									"type": "default"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/thinh.do/Pictures/unknown-user.jpg"
+								},
+								{
+									"key": "description",
+									"value": "Self check-in",
+									"type": "default"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/amenity",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"amenity"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/amenity/all",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"amenity",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/amenity/detail?id=6414085049b56484ee65a7d3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"amenity",
+								"detail"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "6414085049b56484ee65a7d3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/amenity/delete?id=6414085049b56484ee65a7d3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"amenity",
+								"delete"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "6414085049b56484ee65a7d3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "image",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "description",
+									"value": "",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/amenity/update?id=6414085049b56484ee65a7d3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"amenity",
+								"update"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "6414085049b56484ee65a7d3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Category",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Self check-in",
+									"type": "default"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/thinh.do/Pictures/unknown-user.jpg"
+								},
+								{
+									"key": "description",
+									"value": "Self check-in",
+									"type": "default"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/category",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/amenity/all",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"amenity",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/category/detail?id=6414085049b56484ee65a7d3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category",
+								"detail"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "6414085049b56484ee65a7d3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/amenity/delete?id=6414085049b56484ee65a7d3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"amenity",
+								"delete"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "6414085049b56484ee65a7d3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "image",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "description",
+									"value": "",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/category/update?id=6414085049b56484ee65a7d3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category",
+								"update"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "6414085049b56484ee65a7d3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -13,7 +13,7 @@ const { decodeFilterCountRoom } = require("../share/ultils");
 
 const router = express.Router();
 
-// Create a new listing
+// Create a new room
 router.post(
   "/room/create",
   auth,
@@ -45,11 +45,6 @@ router.post(
       if (!errors.isEmpty()) {
         return res.status(400).send({ errors: errors.array() });
       }
-      const imgArr = [];
-      // for (let i = 0; i < req.files.length; i++) {
-      //   const publicUrl = await uploadToStorage(req.files[i]);
-      //   imgArr.push(publicUrl);
-      // }
       const {
         name,
         description,
@@ -110,6 +105,7 @@ router.get("/room", async (req, res) => {
       Room.findById({
         _id: id,
       })
+        .populate("propertyType")
         .exec()
         .then((room) => {
           if (room) {

@@ -116,7 +116,7 @@ categoryRoutes.get("/category/all", async (req, res) => {
 });
 
 // Delete
-categoryRoutes.post("/category/delete", authAdmin, async (req, res) => {
+categoryRoutes.delete("/category/delete", authAdmin, async (req, res) => {
   try {
     const id = req.body.id;
     Category.findOneAndUpdate(

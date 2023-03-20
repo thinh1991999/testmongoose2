@@ -172,25 +172,41 @@ reviewRoutes.post("/review/like", auth, async (req, res) => {
   try {
     const id = req.query.id;
     if (mongoose.Types.ObjectId.isValid(id)) {
-      Review.updateOne(
-        {
-          _id: id,
-          likes: { $ne: req.user._id },
-        },
-        {
-          $inc: {
-            likeCount: 1,
-          },
-          $push: { likes: req.user._id },
-          $pull: { dislikes: req.user._id },
-        }
-      )
+      Review.findOne({
+        _id: id,
+        likes: { $ne: req.user._id },
+      })
         .exec()
-        .then((review) => {
-          return res.status(200).send({ message: "Success" });
-        })
-        .catch((error) => {
-          return res.status(401).send({ error: error.message });
+        .then((rv) => {
+          if (rv) {
+            const { dislikes } = rv;
+            if (dislikes.includes(req.user._id)) {
+              rv.updateOne({
+                $inc: { likeCount: 1, dislikeCount: -1 },
+                $pull: { dislikes: req.user._id },
+                $push: { likes: req.user._id },
+              })
+                .then((review) => {
+                  return res.status(200).send({ message: "Success", review });
+                })
+                .catch((error) => {
+                  return res.status(401).send({ error: error.message });
+                });
+            } else {
+              rv.updateOne({
+                $inc: { likeCount: 1 },
+                $push: { likes: req.user._id },
+              })
+                .then((review) => {
+                  return res.status(200).send({ message: "Success", review });
+                })
+                .catch((error) => {
+                  return res.status(401).send({ error: error.message });
+                });
+            }
+          } else {
+            return res.status(401).send({ error: "Dont have this review" });
+          }
         });
     } else {
       return res.status(401).send({ error: "Invalid id" });
@@ -205,23 +221,41 @@ reviewRoutes.post("/review/dislike", auth, async (req, res) => {
   try {
     const id = req.query.id;
     if (mongoose.Types.ObjectId.isValid(id)) {
-      Review.updateOne(
-        {
-          _id: id,
-          dislikes: { $ne: req.user._id },
-        },
-        {
-          $inc: { dislikeCount: 1 },
-          $push: { dislikes: req.user._id },
-          $pull: { likes: req.user._id },
-        }
-      )
+      Review.findOne({
+        _id: id,
+        dislikes: { $ne: req.user._id },
+      })
         .exec()
-        .then((review) => {
-          return res.status(200).send({ message: "Success" });
-        })
-        .catch((error) => {
-          return res.status(401).send({ error: error.message });
+        .then((rv) => {
+          if (rv) {
+            const { likes } = rv;
+            if (likes.includes(req.user._id)) {
+              rv.updateOne({
+                $inc: { likeCount: -1, dislikeCount: 1 },
+                $push: { dislikes: req.user._id },
+                $pull: { likes: req.user._id },
+              })
+                .then((review) => {
+                  return res.status(200).send({ message: "Success", review });
+                })
+                .catch((error) => {
+                  return res.status(401).send({ error: error.message });
+                });
+            } else {
+              rv.updateOne({
+                $inc: { dislikeCount: 1 },
+                $push: { dislikes: req.user._id },
+              })
+                .then((review) => {
+                  return res.status(200).send({ message: "Success", review });
+                })
+                .catch((error) => {
+                  return res.status(401).send({ error: error.message });
+                });
+            }
+          } else {
+            return res.status(401).send({ error: "Dont have this review" });
+          }
         });
     } else {
       return res.status(401).send({ error: "Invalid id" });
