@@ -37,7 +37,6 @@ app.use(
 );
 app.use(bodyParser.json());
 app.get("/", function (req, res) {
-  console.log(" mot GET Request ve Homepage");
   return res.send("Hello GET");
 });
 
