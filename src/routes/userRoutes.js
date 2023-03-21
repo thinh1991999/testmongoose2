@@ -1,10 +1,50 @@
+require("dotenv").config();
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { auth } = require("../middlewares/auth");
 const { check, validationResult } = require("express-validator");
 const { multerUploads, uploadToStorage } = require("../middlewares/multer");
-
+// const mailgun = require("mailgun-js");
+// const mg = mailgun({ apiKey: process.env.API_KEY, domain: process.env.DOMAIN });
+// Your Auth Token from www.twilio.com/console
+const nodemailer = require("nodemailer");
+const fs = require("fs");
+const Email = require("email-templates");
 const router = express.Router();
+
+router.post("/test/mail", async (req, res) => {
+  let testAccount = await nodemailer.createTestAccount();
+
+  // create reusable transporter object using the default SMTP transport
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "19130213@st.hcmuaf.edu.vn", // generated ethereal user
+      pass: "bwewvwkhzmycohhh",
+    },
+  });
+  const email = new Email();
+  transporter
+    .sendMail({
+      from: "19130213@st.hcmuaf.edu.vn", // sender address
+      to: "thinhtyt1999@gmail.com", // list of receivers
+      subject: "Hello ✔", // Subject line
+      text: "Hello world?", // plain text body
+      html: email.render("index.html"), // html body
+    })
+    .then((info) => {
+      return res.status(200).send({
+        info,
+        preview: nodemailer.getTestMessageUrl(info),
+      });
+    })
+    .catch((err) => {
+      return res.status(400).send({
+        err,
+      });
+    });
+});
 
 // Create a new user
 router.post(
@@ -28,22 +68,74 @@ router.post(
       if (!errors.isEmpty()) {
         return res.status(400).send({ errors: errors.array()[0].msg });
       }
-      const { email, firstName, lastName, password } = req.body;
+      const {
+        email,
+        firstName,
+        lastName,
+        address,
+        description,
+        phoneNumber,
+        gender,
+        password,
+      } = req.body;
       User.findOne({ email })
         .exec()
         .then((user) => {
           if (user === null) {
-            const newUser = new User({ email, firstName, lastName, password });
-            newUser
-              .save()
-              .then(() => {
-                return res.status(200).send({
-                  message: "Sign up successfull",
-                });
-              })
-              .catch((err) => {
-                return res.status(400).send(err);
-              });
+            // const token = jwt.sign(
+            //   {
+            //     email,
+            //     firstName,
+            //     lastName,
+            //     address,
+            //     description,
+            //     phoneNumber,
+            //     gender,
+            //     password,
+            //   },
+            //   process.env.JWT_KEY,
+            //   {
+            //     expiresIn: "2m",
+            //   }
+            // );
+            // const data = {
+            //   from: "noreply@hello.com",
+            //   to: email,
+            //   subject: "Account Activation Link",
+            //   html: `
+            //   <a>${process.env.CLIENT_URL}/authen/activate/${token}</a>
+            //   `,
+            // };
+            // mg.messages().send(data, function (error, body) {
+            //   if (error) {
+            //     return res.status(400).send(error);
+            //   } else {
+            //     return res.status(200).send({
+            //       mess: "Vui lòng vào gmail xác nhận tạo tài khoản",
+            //       body,
+            //     });
+            //   }
+            // });
+            // const newUser = new User({
+            //   email,
+            //   firstName,
+            //   lastName,
+            //   password,
+            //   address,
+            //   description,
+            //   phoneNumber,
+            //   gender,
+            // });
+            // newUser
+            //   .save()
+            //   .then(() => {
+            //     return res.status(200).send({
+            //       message: "Sign up successfull",
+            //     });
+            //   })
+            //   .catch((err) => {
+            //     return res.status(400).send(err);
+            //   });
           } else {
             return res.status(400).send({
               error: "This email is already registered",

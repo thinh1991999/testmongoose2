@@ -12,21 +12,21 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const propertyTypeRoutes = require("./routes/propertyTypeRoutes");
 const typePlaceRoutes = require("./routes/typePlaceRoutes");
 
-// const { connectDb } = require("./config/db");
-// const startSocket = require("./socket/socket");
+const { connectDb } = require("./config/db");
+const startSocket = require("./socket/socket");
 
-// connectDb();
+connectDb();
 
 const port = process.env.PORT || 3000;
 
 const app = express();
 const server = http.createServer(app);
-// const io = new Server(server, {
-//   cors: {
-//     origin: "http://127.0.0.1:5173",
-//     methods: ["GET", "POST"],
-//   },
-// });
+const io = new Server(server, {
+  cors: {
+    origin: "http://127.0.0.1:5173",
+    methods: ["GET", "POST"],
+  },
+});
 
 app.use(cors());
 app.use(
@@ -39,16 +39,16 @@ app.get("/", function (req, res) {
   return res.send("Hello GET");
 });
 
-// app.use(userRouter);
-// app.use(roomRoutes);
-// app.use(amenityRoutes);
-// app.use(categoryRoutes);
-// app.use(adminRoutes);
-// app.use(reviewRoutes);
-// app.use(propertyTypeRoutes);
-// app.use(typePlaceRoutes);
+app.use(userRouter);
+app.use(roomRoutes);
+app.use(amenityRoutes);
+app.use(categoryRoutes);
+app.use(adminRoutes);
+app.use(reviewRoutes);
+app.use(propertyTypeRoutes);
+app.use(typePlaceRoutes);
 
-// startSocket(io);
+startSocket(io);
 server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
