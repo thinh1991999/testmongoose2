@@ -1,4 +1,6 @@
 const express = require("express");
+const dotenv = require("dotenv");
+dotenv.config({ path: "./.env" });
 const http = require("http");
 const { Server } = require("socket.io");
 var cors = require("cors");
@@ -11,7 +13,6 @@ const adminRoutes = require("./routes/adminRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const propertyTypeRoutes = require("./routes/propertyTypeRoutes");
 const typePlaceRoutes = require("./routes/typePlaceRoutes");
-
 const { connectDb } = require("./config/db");
 const startSocket = require("./socket/socket");
 
@@ -29,6 +30,7 @@ const io = new Server(server, {
 });
 
 app.use(cors());
+app.set("view engine", "ejs");
 app.use(
   bodyParser.urlencoded({
     extended: true,

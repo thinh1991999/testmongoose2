@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-// const bcrypt = require("bcryptjs");
+const bcrypt = require("bcryptjs");
 const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
 
@@ -107,8 +107,8 @@ userSchema.pre("save", async function (next) {
   // Hash the password before saving the user model
   const user = this;
   if (user.isModified("password")) {
-    // user.password = await bcrypt.hash(user.password, 8);
-    user.password = await argon2.hash(user.password);
+    user.password = await bcrypt.hash(user.password, 8);
+    // user.password = await argon2.hash(user.password);
   }
   next();
 });
@@ -128,10 +128,9 @@ userSchema.statics.findByCredentials = async (email, password) => {
   if (!user) {
     throw new Error("Invalid login credentials");
   }
-  // const isPasswordMatch = await bcrypt.compare(password, user.password);
-  const realPw = await argon2.verify(user.password);
-  const isPasswordMatch = realPw === password;
-
+  const isPasswordMatch = await bcrypt.compare(password, user.password);
+  // const realPw = await argon2.verify(user.password);
+  // const isPasswordMatch = realPw === password;
   if (!isPasswordMatch) {
     throw new Error("Wrong password");
   }

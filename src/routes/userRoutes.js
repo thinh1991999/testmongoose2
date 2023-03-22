@@ -1,49 +1,56 @@
-require("dotenv").config();
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { auth } = require("../middlewares/auth");
 const { check, validationResult } = require("express-validator");
 const { multerUploads, uploadToStorage } = require("../middlewares/multer");
-// const mailgun = require("mailgun-js");
-// const mg = mailgun({ apiKey: process.env.API_KEY, domain: process.env.DOMAIN });
-// Your Auth Token from www.twilio.com/console
 const nodemailer = require("nodemailer");
-const fs = require("fs");
-const Email = require("email-templates");
+const ejs = require("ejs");
 const router = express.Router();
+const argon2 = require("argon2");
+const bcrypt = require("bcryptjs");
 
 router.post("/test/mail", async (req, res) => {
-  let testAccount = await nodemailer.createTestAccount();
-
-  // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "19130213@st.hcmuaf.edu.vn", // generated ethereal user
-      pass: "bwewvwkhzmycohhh",
+      user: process.env.GMAIL_USER, // generated ethereal user
+      pass: process.env.APP_GMAIL_PASS,
     },
   });
-  const email = new Email();
-  transporter
-    .sendMail({
-      from: "19130213@st.hcmuaf.edu.vn", // sender address
-      to: "thinhtyt1999@gmail.com", // list of receivers
-      subject: "Hello ✔", // Subject line
-      text: "Hello world?", // plain text body
-      html: email.render("index.html"), // html body
-    })
-    .then((info) => {
-      return res.status(200).send({
-        info,
-        preview: nodemailer.getTestMessageUrl(info),
-      });
-    })
-    .catch((err) => {
-      return res.status(400).send({
-        err,
-      });
-    });
+  ejs.renderFile(
+    "emails/verifyEmail.ejs",
+    {
+      link: "1234.com",
+    },
+    (err, str) => {
+      if (err) {
+        return res.status(400).send({
+          err,
+        });
+      } else {
+        transporter
+          .sendMail({
+            from: "19130213@st.hcmuaf.edu.vn", // sender address
+            to: "thinhtyt1999@gmail.com", // list of receivers
+            subject: "Hello ✔", // Subject line
+            text: "Hello world?", // plain text body
+            html: str, // html body
+          })
+          .then((info) => {
+            return res.status(200).send({
+              info,
+              preview: nodemailer.getTestMessageUrl(info),
+            });
+          })
+          .catch((err) => {
+            return res.status(400).send({
+              err,
+            });
+          });
+      }
+    }
+  );
 });
 
 // Create a new user
@@ -82,60 +89,63 @@ router.post(
         .exec()
         .then((user) => {
           if (user === null) {
-            // const token = jwt.sign(
-            //   {
-            //     email,
-            //     firstName,
-            //     lastName,
-            //     address,
-            //     description,
-            //     phoneNumber,
-            //     gender,
-            //     password,
-            //   },
-            //   process.env.JWT_KEY,
-            //   {
-            //     expiresIn: "2m",
-            //   }
-            // );
-            // const data = {
-            //   from: "noreply@hello.com",
-            //   to: email,
-            //   subject: "Account Activation Link",
-            //   html: `
-            //   <a>${process.env.CLIENT_URL}/authen/activate/${token}</a>
-            //   `,
-            // };
-            // mg.messages().send(data, function (error, body) {
-            //   if (error) {
-            //     return res.status(400).send(error);
-            //   } else {
-            //     return res.status(200).send({
-            //       mess: "Vui lòng vào gmail xác nhận tạo tài khoản",
-            //       body,
-            //     });
-            //   }
-            // });
-            // const newUser = new User({
-            //   email,
-            //   firstName,
-            //   lastName,
-            //   password,
-            //   address,
-            //   description,
-            //   phoneNumber,
-            //   gender,
-            // });
-            // newUser
-            //   .save()
-            //   .then(() => {
-            //     return res.status(200).send({
-            //       message: "Sign up successfull",
-            //     });
-            //   })
-            //   .catch((err) => {
-            //     return res.status(400).send(err);
-            //   });
+            const token = jwt.sign(
+              {
+                email,
+                firstName,
+                lastName,
+                address,
+                description,
+                phoneNumber,
+                gender,
+                password,
+              },
+              process.env.JWT_KEY,
+              {
+                expiresIn: "2m",
+              }
+            );
+            let transporter = nodemailer.createTransport({
+              service: "gmail",
+              auth: {
+                user: process.env.GMAIL_USER,
+                pass: process.env.APP_GMAIL_PASS,
+              },
+            });
+            ejs.renderFile(
+              "emails/verifyEmail.ejs",
+              {
+                link: `${process.env.CLIENT_URL}authen/verify/?token=${token}`,
+              },
+              (err, str) => {
+                if (err) {
+                  return res.status(400).send({
+                    err,
+                  });
+                } else {
+                  transporter
+                    .sendMail({
+                      from: "19130213@st.hcmuaf.edu.vn", // sender address
+                      to: "thinhtyt1999@gmail.com", // list of receivers
+                      subject: "Verify your account ✔", // Subject line
+                      text: "Verify your account?", // plain text body
+                      html: str, // html body
+                    })
+                    .then((info) => {
+                      return res.status(200).send({
+                        info,
+                        preview: nodemailer.getTestMessageUrl(info),
+                        message: "Account verify email sent to " + email,
+                      });
+                    })
+                    .catch((err) => {
+                      return res.status(400).send({
+                        err,
+                      });
+                    });
+                }
+              }
+            );
           } else {
             return res.status(400).send({
               error: "This email is already registered",
@@ -155,6 +165,194 @@ router.post(
   }
 );
 
+// Verify email
+router.post("/user/verify/email", async (req, res) => {
+  try {
+    const token = req.query.token;
+    if (token) {
+      jwt.verify(token, process.env.JWT_KEY, (err, decodedToken) => {
+        if (err) {
+          return res.status(400).send({
+            error: err.message,
+          });
+        } else {
+          const {
+            email,
+            firstName,
+            lastName,
+            address,
+            description,
+            phoneNumber,
+            gender,
+            password,
+          } = decodedToken;
+          const newUser = new User({
+            email,
+            firstName,
+            lastName,
+            password,
+            address,
+            description,
+            phoneNumber,
+            gender,
+          });
+          newUser
+            .save()
+            .then(() => {
+              return res.status(200).send({
+                message: "Verify email successful, you can sign in now.",
+              });
+            })
+            .catch((err) => {
+              return res.status(400).send(err);
+            });
+        }
+      });
+    }
+  } catch (error) {
+    return res.status(400).send({
+      error: error.message,
+    });
+  }
+});
+
+// Forgot password
+router.post("/user/forgot/pw", async (req, res) => {
+  try {
+    const email = req.body.email;
+    User.findOne({
+      email,
+    }).then((user) => {
+      if (user) {
+        const token = jwt.sign(
+          { _id: user._id },
+          process.env.RESET_PASSWORD_KEY,
+          {
+            expiresIn: "20m",
+          }
+        );
+        let transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.GMAIL_USER,
+            pass: process.env.APP_GMAIL_PASS,
+          },
+        });
+        const link = `${process.env.CLIENT_URL}authen/reset-pw/?token=${token}`;
+        ejs.renderFile(
+          "emails/resetPw.ejs",
+          {
+            link,
+          },
+          (err, str) => {
+            if (err) {
+              return res.status(400).send({
+                err,
+              });
+            } else {
+              transporter
+                .sendMail({
+                  from: process.env.GMAIL_USER, // sender address
+                  to: email, // list of receivers
+                  subject: "Reset your password", // Subject line
+                  text: "Reset your password", // plain text body
+                  html: str, // html body
+                })
+                .then((info) => {
+                  user
+                    .updateOne({
+                      resetPwLink: token,
+                    })
+                    .exec()
+                    .then(() => {
+                      return res.status(200).send({
+                        message: "Account recovery email sent to " + email,
+                        info,
+                        preview: nodemailer.getTestMessageUrl(info),
+                      });
+                    })
+                    .catch((err) => {
+                      return res.status(400).send({
+                        err,
+                      });
+                    });
+                })
+                .catch((err) => {
+                  return res.status(400).send({
+                    err,
+                  });
+                });
+            }
+          }
+        );
+      } else {
+        return res.status(400).send({
+          error: "Dont have this email account",
+        });
+      }
+    });
+  } catch (error) {
+    return res.status(400).send({
+      error: error.message,
+    });
+  }
+});
+
+// Reset password by link
+router.post("/user/reset/pw/link", async (req, res) => {
+  try {
+    const { token, newPw } = req.body;
+    if (token) {
+      jwt.verify(token, process.env.RESET_PASSWORD_KEY, async (err, result) => {
+        if (err) {
+          return res.status(400).send({
+            error: err.message || "Something error",
+          });
+        } else {
+          const { _id } = result;
+          User.findOne({
+            _id,
+            resetPwLink: token,
+          }).then(async (user) => {
+            if (user) {
+              const obj = {
+                password: await bcrypt.hash(newPw, 8),
+                resetPwLink: "",
+              };
+              user
+                .updateOne({
+                  ...obj,
+                })
+                .then(() => {
+                  return res.status(200).send({
+                    message: "Update password successful",
+                  });
+                })
+                .catch((err) => {
+                  return res.status(400).send({
+                    error: err.message || "Something error",
+                  });
+                });
+            } else {
+              return res.status(400).send({
+                error: "Something error",
+              });
+            }
+          });
+        }
+      });
+    } else {
+      return res.status(400).send({
+        error: "Something error",
+      });
+    }
+  } catch (error) {
+    return res.status(400).send({
+      error: error.message,
+    });
+  }
+});
+
 // Login
 router.post("/user/login", async (req, res) => {
   try {
@@ -168,6 +366,7 @@ router.post("/user/login", async (req, res) => {
     const token = await user.generateAuthToken();
     return res.send({ user, token });
   } catch (error) {
+    console.log(error);
     return res.status(400).send({
       error: error.message,
     });
@@ -313,179 +512,6 @@ router.put(
     }
   }
 );
-
-// router.post("/usersTest", async (req, res) => {
-//   // Create a new user
-//   try {
-//     const { email, name, password } = req.body;
-//     User.findOne({ email }).exec((err, user) => {
-//       if (user) {
-//         res.status(400).send({
-//           error: "Email này đã được đăng ký!",
-//         });
-//         return;
-//       }
-//       const newUser = new User({ email, name, password });
-//       newUser.save((err, success) => {
-//         if (err) {
-//           res.status(400).send({
-//             error: "Có lỗi xảy ra, vui lòng thử lại!",
-//           });
-//           return;
-//         } else {
-//           res.status(200).send({
-//             mess: "Đăng ký thành công!",
-//           });
-//         }
-//       });
-//     });
-//   } catch (error) {
-//     res.status(400).send(error);
-//   }
-// });
-
-// router.post("/email-activate", async (req, res) => {
-//   // activate email
-//   try {
-//     const { token } = req.body;
-//     if (token) {
-//       jwt.verify(token, process.env.JWT_KEY, (err, decodedToken) => {
-//         if (err) {
-//           res.status(400).send({
-//             error: "Đường dẫn không đúng hoặc đã hết hạn!",
-//           });
-//           return;
-//         }
-//         const { email, name, password } = decodedToken;
-//         User.findOne({ email }).exec((err, user) => {
-//           if (user) {
-//             res.status(400).send({
-//               error: "Email này đã được đăng ký!",
-//             });
-//             return;
-//           }
-//           const newUser = new User({ email, name, password });
-//           newUser.save((err, success) => {
-//             if (err) {
-//               res.status(400).send({
-//                 error: "Có lỗi xảy ra, vui lòng thử lại!",
-//               });
-//               return;
-//             } else {
-//               res.status(200).send({
-//                 mess: "Đăng ký thành công!",
-//               });
-//             }
-//           });
-//         });
-//       });
-//     } else {
-//       res.status(400).send({
-//         error: "Co",
-//       });
-//     }
-//     // await user.save();
-//     // const token = await user.generateAuthToken();
-//     // res.status(201).send({ user, token });
-//   } catch (error) {
-//     res.status(400).send(error);
-//   }
-// });
-
-// router.post("/users/login", async (req, res) => {
-//   //Login a registered user
-//   try {
-//     const { email, password } = req.body;
-//     const user = await User.findByCredentials(email, password);
-//     if (!user) {
-//       return res
-//         .status(401)
-//         .send({ error: "Login failed! Check authentication credentials" });
-//     }
-//     const token = await user.generateAuthToken();
-//     return res.send({ user, token });
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(400).send(error);
-//   }
-// });
-
-// router.get("/users/me", auth, async (req, res) => {
-//   // View logged in user profile
-//   res.send(req.user);
-// });
-
-// router.post("/users/me/update/profile", auth, async (req, res) => {
-//   // Log user out of the application
-//   try {
-//     const { phone, name, gender } = req.body;
-//     User.findOneAndUpdate(
-//       { email: req.email },
-//       { phone, name, gender },
-//       { runValidators: true },
-//       (err, user) => {
-//         if (err) {
-//           return res
-//             .status(500)
-//             .send({ error: "Có lỗi xảy ra, vui lòng thử lại" });
-//         } else {
-//           return res.status(200).send({ mess: "Cap nhat thanh cong" });
-//         }
-//       }
-//     );
-//   } catch (error) {
-//     return res.status(500).send(error);
-//   }
-// });
-
-// router.post("/users/forgotPw", async (req, res) => {
-//   // Log user out of the application
-//   try {
-//     const { email } = req.body;
-//     User.findOne({ email }, (err, user) => {
-//       if (err || !user) {
-//         return res.status(400).send({
-//           error: "Không tồn tại tài khoản đăng ký với email này",
-//         });
-//       }
-//       const token = jwt.sign(
-//         { _id: user._id },
-//         process.env.RESET_PASSWORD_KEY,
-//         {
-//           expiresIn: "20m",
-//         }
-//       );
-//       const data = {
-//         from: "noreply@hello.com",
-//         to: email,
-//         subject: "Account Activation Link",
-//         html: `
-//         <h2>Please click on given link to reset your password</h2>
-//         <a>${process.env.CLIENT_URL}/authen/resetPw/${token}</a>
-//         `,
-//       };
-//       User.updateOne({ resetPwLink: token }, (err, success) => {
-//         if (err) {
-//           return res.status(400).send({
-//             error: "Link cập nhật mật khẩu xảy ra lỗi",
-//           });
-//         } else {
-//           mg.messages().send(data, function (error, body) {
-//             if (error) {
-//               return res.status(400).send(error);
-//             } else {
-//               return res.status(200).send({
-//                 mess: "Vui lòng vào gmail xác nhận đặt lại mật khẩu",
-//               });
-//             }
-//           });
-//         }
-//       });
-//     });
-//   } catch (error) {
-//     return res.status(500).send(error);
-//   }
-// });
 
 // router.post("/users/reset-pw", async (req, res) => {
 //   // Log user out of the application
