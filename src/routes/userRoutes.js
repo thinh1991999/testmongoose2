@@ -7,7 +7,6 @@ const { multerUploads, uploadToStorage } = require("../middlewares/multer");
 const nodemailer = require("nodemailer");
 const ejs = require("ejs");
 const router = express.Router();
-const argon2 = require("argon2");
 const bcrypt = require("bcryptjs");
 
 router.post("/test/mail", async (req, res) => {
